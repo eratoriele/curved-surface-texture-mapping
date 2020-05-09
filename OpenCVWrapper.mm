@@ -49,7 +49,7 @@
     
     // Vector that stores the line values
     std::vector<cv::Vec4i> lines;
-    cv::HoughLinesP(edges, lines, 1, CV_PI / 180, 80, 395, 125);
+    cv::HoughLinesP(edges, lines, 2.6, CV_PI / 180, 80, 395, 125);
     
     std::vector<int> linesonleft;
     std::vector<int> linesonright;

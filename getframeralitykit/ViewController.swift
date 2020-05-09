@@ -18,6 +18,12 @@ class ViewController: UIViewController {
     var timer : Timer!
     var updateCV : Bool = true
     
+    var cannyFirstSliderValue : Float = 0.0
+    var cannySecondSliderValue : Float = 0.0
+    var houghThresholdSliderValue : Float = 0.0
+    var houghMinLengthSliderValue : Float = 0.0
+    var houghMaxGapSliderValue : Float = 0.0
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidLoad()
         
@@ -39,16 +45,67 @@ class ViewController: UIViewController {
         
         timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(enableUpdateCV), userInfo: nil, repeats: true)
         
-        // 5 sliders are needed
-        let rect = CGRect(x: 25, y: 600, width: 200, height: 10)
-        let slider = UISlider(frame: rect)
-        slider.maximumValue = 100
-        slider.minimumValue = 0
-        slider.value = 50
-        slider.isContinuous = false
-        slider.addTarget(self, action: #selector(sliderChanged(sender:)), for: UIControl.Event.valueChanged)
         
-        self.view.addSubview(slider)
+        // 5 sliders are needed
+        // First, canny's first treshold
+        let cannyFirstRect = CGRect(x: 15, y: 600, width: 180, height: 10)
+        let cannyFirstSlider = UISlider(frame: cannyFirstRect)
+        cannyFirstSlider.maximumValue = 255
+        cannyFirstSlider.minimumValue = 0
+        cannyFirstSlider.value = 50
+        cannyFirstSlider.isContinuous = false
+        cannyFirstSlider.addTarget(self, action: #selector(cannyFirstSliderChanged(sender:)),
+                                   for: UIControl.Event.valueChanged)
+        
+        self.view.addSubview(cannyFirstSlider)
+        
+        // canny's second treshold
+        let cannySecondRect = CGRect(x: 15, y: 650, width: 180, height: 10)
+        let cannySecondSlider = UISlider(frame: cannySecondRect)
+        cannySecondSlider.maximumValue = 255
+        cannySecondSlider.minimumValue = 0
+        cannySecondSlider.value = 50
+        cannySecondSlider.isContinuous = false
+        cannySecondSlider.addTarget(self, action: #selector(cannySecondSliderChanged(sender:)),
+                                   for: UIControl.Event.valueChanged)
+        
+        self.view.addSubview(cannySecondSlider)
+        
+        // hough's treshold
+        let houghThresholdRect = CGRect(x: 210, y: 550, width: 180, height: 10)
+        let houghThresholdSlider = UISlider(frame: houghThresholdRect)
+        houghThresholdSlider.maximumValue = 255
+        houghThresholdSlider.minimumValue = 0
+        houghThresholdSlider.value = 50
+        houghThresholdSlider.isContinuous = false
+        houghThresholdSlider.addTarget(self, action: #selector(houghThresholdSliderChanged(sender:)),
+                                   for: UIControl.Event.valueChanged)
+        
+        self.view.addSubview(houghThresholdSlider)
+        
+        // hough's min line length
+        let houghMinLengthRect = CGRect(x: 210, y: 600, width: 180, height: 10)
+        let houghMinLengthSlider = UISlider(frame: houghMinLengthRect)
+        houghMinLengthSlider.maximumValue = 500
+        houghMinLengthSlider.minimumValue = 0
+        houghMinLengthSlider.value = 50
+        houghMinLengthSlider.isContinuous = false
+        houghMinLengthSlider.addTarget(self, action: #selector(houghMinLengthSliderChanged(sender:)),
+                                    for: UIControl.Event.valueChanged)
+         
+        self.view.addSubview(houghMinLengthSlider)
+        
+        // hough's max line gap
+        let houghMaxGapRect = CGRect(x: 210, y: 650, width: 180, height: 10)
+        let houghMaxGapSlider = UISlider(frame: houghMaxGapRect)
+        houghMaxGapSlider.maximumValue = 255
+        houghMaxGapSlider.minimumValue = 0
+        houghMaxGapSlider.value = 50
+        houghMaxGapSlider.isContinuous = false
+        houghMaxGapSlider.addTarget(self, action: #selector(houghMaxGapSliderChanged(sender:)),
+                                    for: UIControl.Event.valueChanged)
+         
+         self.view.addSubview(houghMaxGapSlider)
         
         // Add an empty shapelayer to recplace later
         arView.layer.addSublayer(CAShapeLayer())
@@ -58,10 +115,25 @@ class ViewController: UIViewController {
         updateCV = true;
     }
     
-    @objc func sliderChanged(sender: UISlider) {
-        print(sender.value)
+    @objc func cannyFirstSliderChanged(sender: UISlider) {
+        cannyFirstSliderValue = sender.value
     }
     
+    @objc func cannySecondSliderChanged(sender: UISlider) {
+        cannySecondSliderValue = sender.value
+    }
+    
+    @objc func houghThresholdSliderChanged(sender: UISlider) {
+        houghThresholdSliderValue = sender.value
+    }
+    
+    @objc func houghMinLengthSliderChanged(sender: UISlider) {
+        houghMinLengthSliderValue = sender.value
+    }
+    
+    @objc func houghMaxGapSliderChanged(sender: UISlider) {
+        houghMaxGapSliderValue = sender.value
+    }
 }
 
 extension ViewController: ARSessionDelegate {
