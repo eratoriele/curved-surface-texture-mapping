@@ -34,9 +34,21 @@ class ViewController: UIViewController {
         
         configuration.detectionImages = trackedImages
         configuration.maximumNumberOfTrackedImages = 10
+        
         arView.session.run(configuration)
         
         timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(enableUpdateCV), userInfo: nil, repeats: true)
+        
+        // 5 sliders are needed
+        let rect = CGRect(x: 25, y: 600, width: 200, height: 10)
+        let slider = UISlider(frame: rect)
+        slider.maximumValue = 100
+        slider.minimumValue = 0
+        slider.value = 50
+        slider.isContinuous = false
+        slider.addTarget(self, action: #selector(sliderChanged(sender:)), for: UIControl.Event.valueChanged)
+        
+        self.view.addSubview(slider)
         
         // Add an empty shapelayer to recplace later
         arView.layer.addSublayer(CAShapeLayer())
@@ -44,6 +56,10 @@ class ViewController: UIViewController {
     
     @objc func enableUpdateCV() {
         updateCV = true;
+    }
+    
+    @objc func sliderChanged(sender: UISlider) {
+        print(sender.value)
     }
     
 }
@@ -80,7 +96,9 @@ extension ViewController: ARSessionDelegate {
                     
                     let points = lines.split(separator: "_")
                     
-                    let multiplier : Double = 720 / 1920;
+                    print(points)
+                    
+                    let multiplier : Double = 736 / 1920;
                     
                     // Remove sublayers from previous frame
                     for subl in arView.layer.sublayers! {
@@ -89,24 +107,27 @@ extension ViewController: ARSessionDelegate {
                         }
                     }
                     
-                    // Add every line as a sublayer
-                    for i in (0...points.count/4) {
-                        let line = UIBezierPath()
-                        
-                        line.move(to: CGPoint(x: Double(String(points[i]))! * multiplier,
-                                              y: Double(String(points[i + 1]))! * multiplier))
-                        line.addLine(to: CGPoint(x: Double(String(points[i + 2]))! * multiplier,
-                                                 y: Double(String(points[i + 3]))! * multiplier))
-                        
-                        
-                        let shapeLayer = CAShapeLayer()
-                        shapeLayer.path = line.cgPath
-                        shapeLayer.strokeColor = UIColor.blue.cgColor
-                        shapeLayer.fillColor = UIColor.clear.cgColor
-                        shapeLayer.lineWidth = 3
+                    let line = UIBezierPath()
+                    /*
+                    line.move(to: CGPoint(x: Double(String(points[0]))! * multiplier,
+                                          y: Double(String(points[1]))! * multiplier))
+                    line.addLine(to: CGPoint(x: Double(String(points[2]))! * multiplier,
+                                             y: Double(String(points[3]))! * multiplier))
+                    */
+                
+                    line.move(to: CGPoint(x: 0,
+                                          y: 0))
+                    line.addLine(to: CGPoint(x: 414,
+                                             y: 736 ))
                     
-                        arView.layer.addSublayer(shapeLayer)
-                    }
+                    let shapeLayer = CAShapeLayer()
+                    shapeLayer.path = line.cgPath
+                    shapeLayer.strokeColor = UIColor.blue.cgColor
+                    shapeLayer.fillColor = UIColor.clear.cgColor
+                    shapeLayer.lineWidth = 3
+                
+                    arView.layer.addSublayer(shapeLayer)
+                
                     
                     updateCV = false
                 }
