@@ -14,11 +14,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface OpenCVWrapper : NSObject
 
-- (int) test: (int)x y: (int)y;
-
-- (NSArray *) test2: (int)x y: (int)y;
-
-- (NSString *) test3: (int)x y: (int)y image: (CVPixelBufferRef)image;
+- (NSString *) test: (int)x y: (int)y
+                   cannyFirstThreshold: (double)cannyFirstThreshold
+                   cannySecondThreshold: (double)cannySecondThreshold
+                   houghThreshold: (double)houghThreshold
+                   houghMinLength: (double)houghMinLength
+                   houghMaxGap: (double)houghMaxGap
+                   image: (CVPixelBufferRef)image;
 
 
 @end

@@ -16,19 +16,13 @@
 
 @implementation OpenCVWrapper
 
-- (int) test: (int)x y: (int)y {
-    return x;
-}
-
-- (NSArray *) test2: (int)x y: (int)y {
-    
-    printf("%d, %d", x, y);
-    
-    return @[@'x', @'y'];
-    
-}
-
-- (NSString *) test3: (int)x y: (int)y image: (CVPixelBufferRef) image {
+- (NSString *) test: (int)x y: (int)y
+                    cannyFirstThreshold: (double)cannyFirstThreshold
+                    cannySecondThreshold: (double)cannySecondThreshold
+                    houghThreshold: (double)houghThreshold
+                    houghMinLength: (double)houghMinLength
+                    houghMaxGap: (double)houghMaxGap
+                    image: (CVPixelBufferRef)image {
      
     // convert CVPixelBufferRef to cv::Mat to be used in OpenCV functions
     cv::Mat img;
@@ -45,11 +39,11 @@
     
     // Mat that stores edge image
     cv::Mat edges;
-    cv::Canny(img, edges, 150, 200);
+    cv::Canny(img, edges, cannyFirstThreshold, cannySecondThreshold);
     
     // Vector that stores the line values
     std::vector<cv::Vec4i> lines;
-    cv::HoughLinesP(edges, lines, 2.6, CV_PI / 180, 80, 395, 125);
+    cv::HoughLinesP(edges, lines, 2.6, CV_PI / 180, houghThreshold, houghMinLength, houghMaxGap);
     
     std::vector<int> linesonleft;
     std::vector<int> linesonright;
@@ -62,8 +56,6 @@
         int a1 = lines[i][3] - lines[i][1];
         int b1 = lines[i][0] - lines[i][2];
         int c1 = a1 * (lines[i][0]) + b1 * (lines[i][1]);
-        
-        printf("%d / ", a1);
         
         // Line found point to edge of screen represented as a2x + b2y = c2
         int a2 = 0;
@@ -116,6 +108,10 @@
     int distance = height;
     int line1x1 = 0;
     int line1y1 = 0;
+    int line1x2 = 0;
+    int line1y2 = 0;
+    int line2x1 = 0;
+    int line2y1 = 0;
     int line2x2 = 0;
     int line2y2 = 0;
 
@@ -132,6 +128,10 @@
                     distance = far;
                     line1x1 = linesonleft[i*5];
                     line1y1 = linesonleft[i*5 + 1];
+                    line1x2 = linesonleft[i*5 + 2];
+                    line1y2 = linesonleft[i*5 + 3];
+                    line2x1 = linesonright[j*5];
+                    line2y1 = linesonright[j*5 + 1];
                     line2x2 = linesonright[j*5 + 2];
                     line2y2 = linesonright[j*5 + 3];
                 }
@@ -139,9 +139,13 @@
         }
     }
     
-    NSString *returnstr = [NSString stringWithFormat: @"%@_%@_%@_%@",
+    NSString *returnstr = [NSString stringWithFormat: @"%@_%@_%@_%@_%@_%@_%@_%@",
                             [NSString stringWithFormat:@"%d", line1x1],
                             [NSString stringWithFormat:@"%d", line1y1],
+                            [NSString stringWithFormat:@"%d", line1x2],
+                            [NSString stringWithFormat:@"%d", line1y2],
+                            [NSString stringWithFormat:@"%d", line2x1],
+                            [NSString stringWithFormat:@"%d", line2y1],
                             [NSString stringWithFormat:@"%d", line2x2],
                             [NSString stringWithFormat:@"%d", line2y2]];
     
