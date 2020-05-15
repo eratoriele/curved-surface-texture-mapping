@@ -166,7 +166,6 @@
                             [NSString stringWithFormat:@"%d", line2x2],
                             [NSString stringWithFormat:@"%d", line2y2]];
     
-    printf("%d %d", width, height);
     
     // Return the lines
     return returnstr;

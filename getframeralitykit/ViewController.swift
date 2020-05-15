@@ -10,7 +10,7 @@ import UIKit
 import RealityKit
 import ARKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
     
     @IBOutlet var arView: ARView!
 
@@ -29,6 +29,9 @@ class ViewController: UIViewController {
     var houghThresholdLabel : UILabel = UILabel()
     var houghMinLengthLabel : UILabel = UILabel()
     var houghMaxGapLabel : UILabel = UILabel()
+    
+    var imagePicker = UIImagePickerController()
+    var image = UIImage()
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidLoad()
@@ -143,9 +146,25 @@ class ViewController: UIViewController {
         self.view.addSubview(houghMaxGapSlider)
         self.view.addSubview(houghMaxGapLabel)
         
-        // Add an empty shapelayer to recplace later
-        arView.layer.addSublayer(CAShapeLayer())
+        // Ask to get the texture
+        if UIImagePickerController.isSourceTypeAvailable(.savedPhotosAlbum){
+            
+            imagePicker.delegate = self
+            imagePicker.sourceType = .savedPhotosAlbum
+            imagePicker.allowsEditing = false
+            
+            present(imagePicker, animated: true, completion: nil)
+        }
+ 
     }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        
+        image = (info[.originalImage] as? UIImage)!
+        
+        imagePicker.dismiss(animated: true, completion: nil)
+    }
+    
     
     @objc func enableUpdateCV() {
         updateCV = true;
@@ -241,12 +260,12 @@ extension ViewController: ARSessionDelegate {
                     shapeLayer.path = line.cgPath
                     shapeLayer.opacity = 0.5
                     shapeLayer.strokeColor = UIColor.blue.cgColor
-                    shapeLayer.fillColor = UIColor.green.cgColor
+                    shapeLayer.fillColor = UIColor(patternImage: image).cgColor
                     shapeLayer.lineWidth = 3
                     shapeLayer.lineJoin = CAShapeLayerLineJoin.miter
                 
                     arView.layer.addSublayer(shapeLayer)
-                    
+                
                     
                     updateCV = false
                 }
