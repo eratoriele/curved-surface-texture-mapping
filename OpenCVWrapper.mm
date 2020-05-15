@@ -43,7 +43,7 @@
     
     // Vector that stores the line values
     std::vector<cv::Vec4i> lines;
-    cv::HoughLinesP(edges, lines, 2.6, CV_PI / 180, houghThreshold, houghMinLength, houghMaxGap);
+    cv::HoughLinesP(edges, lines, 1, CV_PI / 180, houghThreshold, houghMinLength, houghMaxGap);
     
     std::vector<int> linesonleft;
     std::vector<int> linesonright;
@@ -73,7 +73,10 @@
                 linesonleft.push_back(lines[i][1]);
                 linesonleft.push_back(lines[i][2]);
                 linesonleft.push_back(lines[i][3]);
-                linesonleft.push_back(-1 * a1 / b1);
+                if (b1 == 0)
+                    linesonleft.push_back(INT_MAX);
+                else
+                    linesonleft.push_back(-1 * a1 / b1);
                 continue;
             }
         }
@@ -97,7 +100,11 @@
                 linesonright.push_back(lines[i][1]);
                 linesonright.push_back(lines[i][2]);
                 linesonright.push_back(lines[i][3]);
-                linesonright.push_back(-1 * a1 / b1);
+                if (b1 == 0)
+                    linesonright.push_back(INT_MAX);
+                else
+                    linesonright.push_back(-1 * a1 / b1);
+                continue;
             }
         }
             
@@ -105,7 +112,7 @@
     
     // find two lines, one on rightone on left, that have the same slope
 
-    int distance = height;
+    int distance = height * 2;
     int line1x1 = 0;
     int line1y1 = 0;
     int line1x2 = 0;
@@ -118,11 +125,21 @@
     for (size_t i = 0; i < linesonleft.size() / 5; i++) {
         for (size_t j = 0; j < linesonright.size() / 5; j++) {
         
-            // If the slopes are the same
-            if (linesonleft[i*5 + 4] == linesonright[j*5 + 4]) {
+            // If the slopes are close enough
+            int slopeDiff = abs(abs(linesonleft[i*5 + 4]) - abs(linesonright[j*5 + 4]));
+            if (slopeDiff < abs(linesonleft[i*5 + 4]) * 2 / 3 or
+                slopeDiff < abs(linesonright[j*5 + 4]) * 2 / 3) {
             
                 // If the line is the closest
-                int far = abs(linesonleft[i*5] - linesonright[j*5]);
+                int far1x = linesonright[j*5] - linesonleft[i*5];
+                int far1y = linesonright[j*5 + 1] - linesonleft[i*5 + 1];
+                int far1 = pow((far1x * far1x + far1y * far1y), 0.5);
+                int far2x = linesonright[j*5 + 2] - linesonleft[i*5 + 2];
+                int far2y = linesonright[j*5 + 3] - linesonleft[i*5 + 3];
+                int far2 = pow((far2x * far2x + far2y * far2y), 0.5);
+                
+                int far = far1 + far2;
+                
                 if (far < distance) {
                     // Record the lines as the closest to the point
                     distance = far;
@@ -149,7 +166,8 @@
                             [NSString stringWithFormat:@"%d", line2x2],
                             [NSString stringWithFormat:@"%d", line2y2]];
     
-                            
+    printf("%d %d", width, height);
+    
     // Return the lines
     return returnstr;
     

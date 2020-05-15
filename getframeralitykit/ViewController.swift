@@ -204,7 +204,10 @@ extension ViewController: ARSessionDelegate {
                     let pos = vector3(anchor.transform[3][0], anchor.transform[3][1], anchor.transform[3][2])
                     let projection = arView.project(pos)
                     
-                    let lines =  opencv.test(Int32(projection!.x), y: Int32(projection!.y),
+                    let multiplier : Double = 736 / 1920;
+                    
+                    let lines =  opencv.test(Int32(Double(projection!.x) / multiplier),
+                                             y: Int32(Double(projection!.y) / multiplier),
                                              cannyFirstThreshold: Double(cannyFirstSliderValue),
                                              cannySecondThreshold: Double(cannySecondSliderValue),
                                              houghThreshold: Double(houghThresholdSliderValue),
@@ -213,8 +216,6 @@ extension ViewController: ARSessionDelegate {
                                              image: arView.session.currentFrame!.capturedImage)
                     
                     let points = lines.split(separator: "_")
-                    
-                    let multiplier : Double = 736 / 1920;
                     
                     // Remove sublayers from previous frame
                     for subl in arView.layer.sublayers! {
@@ -245,7 +246,7 @@ extension ViewController: ARSessionDelegate {
                     shapeLayer.lineJoin = CAShapeLayerLineJoin.miter
                 
                     arView.layer.addSublayer(shapeLayer)
-                
+                    
                     
                     updateCV = false
                 }
