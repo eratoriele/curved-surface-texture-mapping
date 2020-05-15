@@ -50,61 +50,45 @@
     
     // categorize the lines as on the left and on the right
     for(size_t i = 0; i < lines.size(); i++) {
+        // [0] -> x1, [1] -> y1, [2] -> x2, [3] -> y2
         // Finding lines to the left of the point
         
-        // Line x1y1 x2y2 represented as a1x + b1y = c1
-        int a1 = lines[i][3] - lines[i][1];
-        int b1 = lines[i][0] - lines[i][2];
-        int c1 = a1 * (lines[i][0]) + b1 * (lines[i][1]);
+        // formula of line is: y = slope1 * x + c1
+        int diffx = lines[i][2] - lines[i][0];
+        int diffy = lines[i][3] - lines[i][1];
+        int slope1;
+        if (diffx == 0)
+            slope1 = INT_MAX;
+        else
+            slope1 = diffy / diffx;
+        int c1 = lines[i][1] - slope1 * lines[i][0];
         
-        // Line found point to edge of screen represented as a2x + b2y = c2
-        int a2 = 0;
-        int b2 = x;
-        int c2 = b2 * (y);
-        
-        int determinant = a1*b2 - a2*b1;
-        
-        // if they  are not parallel
-        if (determinant != 0) {
-            int foundx = (b2*c1 - b1*c2) / determinant;
-            
-            if (foundx < x and foundx > 0) {
-                linesonleft.push_back(lines[i][0]);
-                linesonleft.push_back(lines[i][1]);
-                linesonleft.push_back(lines[i][2]);
-                linesonleft.push_back(lines[i][3]);
-                if (b1 == 0)
-                    linesonleft.push_back(INT_MAX);
-                else
-                    linesonleft.push_back(-1 * a1 / b1);
-                continue;
-            }
-        }
-        
-        // Finding lines to the right of the point
-        
-        // x1y1 x2y2 line already calculated
-        // Line found point to edge of screen represented as a2x + b2y = c2
-        a2 = 0;
-        b2 = x - height;
-        c2 = a2 * (x) + b2 * (y);
-        
-        determinant = a1*b2 - a2*b1;
+        // The line we are looking for is from found point to all the way left
+        // with slope of 0. so: y = point.y
         
         // if they  are not parallel
-        if (determinant != 0) {
-            int foundx = (b2*c1 - b1*c2) / determinant;
+        if (slope1 != 0) {
+            int foundx = (y - c1) / slope1;
             
-            if (foundx > x and foundx < height){
-                linesonright.push_back(lines[i][0]);
-                linesonright.push_back(lines[i][1]);
-                linesonright.push_back(lines[i][2]);
-                linesonright.push_back(lines[i][3]);
-                if (b1 == 0)
-                    linesonright.push_back(INT_MAX);
-                else
-                    linesonright.push_back(-1 * a1 / b1);
-                continue;
+            if ((x > lines[i][0] and x < lines[i][2]) or
+                (x > lines[i][2] and x < lines[i][0])) {
+                
+                if (foundx < x) {
+                    linesonleft.push_back(lines[i][0]);
+                    linesonleft.push_back(lines[i][1]);
+                    linesonleft.push_back(lines[i][2]);
+                    linesonleft.push_back(lines[i][3]);
+                    linesonleft.push_back(slope1);
+                    continue;
+                }
+                else {
+                    linesonright.push_back(lines[i][0]);
+                    linesonright.push_back(lines[i][1]);
+                    linesonright.push_back(lines[i][2]);
+                    linesonright.push_back(lines[i][3]);
+                    linesonright.push_back(slope1);
+                    continue;
+                }
             }
         }
             
