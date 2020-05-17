@@ -10,6 +10,7 @@
 #import <opencv2/opencv.hpp>
 #import <opencv2/imgcodecs/ios.h>
 #import <opencv2/videoio/cap_ios.h>
+#import <opencv2/core.hpp>
 #endif
 
 #import "OpenCVWrapper.h"
@@ -22,7 +23,8 @@
                     houghThreshold: (double)houghThreshold
                     houghMinLength: (double)houghMinLength
                     houghMaxGap: (double)houghMaxGap
-                    image: (CVPixelBufferRef)image {
+                    image: (CVPixelBufferRef)image
+                    lineMap: (bool)lineMap {
      
     // convert CVPixelBufferRef to cv::Mat to be used in OpenCV functions
     cv::Mat img;
@@ -37,13 +39,15 @@
 
     CVPixelBufferUnlockBaseAddress(image, 0);
     
+    cv::rotate(img, img, cv::ROTATE_90_CLOCKWISE);
+    
     // Mat that stores edge image
     cv::Mat edges;
     cv::Canny(img, edges, cannyFirstThreshold, cannySecondThreshold);
     
     // Vector that stores the line values
     std::vector<cv::Vec4i> lines;
-    cv::HoughLinesP(edges, lines, 1, CV_PI / 180, houghThreshold, houghMinLength, houghMaxGap);
+    cv::HoughLinesP(edges, lines, 1, CV_PI / 360, houghThreshold, houghMinLength, houghMaxGap);
     
     std::vector<int> linesonleft;
     std::vector<int> linesonright;
@@ -57,28 +61,57 @@
         int diffx = lines[i][2] - lines[i][0];
         int diffy = lines[i][3] - lines[i][1];
         int slope1;
-        if (diffx == 0)
-            slope1 = INT_MAX;
-        else
+        // if diffx == 0, then the line is parallel to the y axis
+        // and the formula changes to x = c1
+        // first, solve the rest with formula y = slope1 * x + c1
+        if (diffx != 0) {
             slope1 = diffy / diffx;
-        int c1 = lines[i][1] - slope1 * lines[i][0];
-        
-        // The line we are looking for is from found point to all the way left
-        // with slope of 0. so: y = point.y
-        
-        // if they  are not parallel
-        if (slope1 != 0) {
-            int foundx = (y - c1) / slope1;
+            int c1 = lines[i][1] - slope1 * lines[i][0];
             
-            if ((x > lines[i][0] and x < lines[i][2]) or
-                (x > lines[i][2] and x < lines[i][0])) {
+            // The line we are looking for is from found point to all the way left
+            // with slope of 0. so: y = point.y
+            
+            // if they  are not parallel
+            if (slope1 != 0) {
+                int foundx = (y - c1) / slope1;
                 
-                if (foundx < x) {
+                if ((foundx > lines[i][0] and foundx < lines[i][2]) or
+                    (foundx > lines[i][2] and foundx < lines[i][0])) {
+                    
+                    if (foundx < x) {
+                        linesonleft.push_back(lines[i][0]);
+                        linesonleft.push_back(lines[i][1]);
+                        linesonleft.push_back(lines[i][2]);
+                        linesonleft.push_back(lines[i][3]);
+                        linesonleft.push_back(slope1);
+                        continue;
+                    }
+                    else {
+                        linesonright.push_back(lines[i][0]);
+                        linesonright.push_back(lines[i][1]);
+                        linesonright.push_back(lines[i][2]);
+                        linesonright.push_back(lines[i][3]);
+                        linesonright.push_back(slope1);
+                        continue;
+                    }
+                }
+            }
+        }
+        // Bother with lines parallel to y axis last
+        else {
+            // if line is parallel to y, it is definetely a line that
+            // either belongs to left or right of the found line
+            // only restraint is:
+            if ((y >= lines[i][1] and y <= lines[i][3]) or
+                (y >= lines[i][3] and y <= lines[i][1])) {
+                // if this is true, than they are defineletly crossing
+                // now, to find if it is either on left or right
+                if (x > lines[i][0]) {
                     linesonleft.push_back(lines[i][0]);
                     linesonleft.push_back(lines[i][1]);
                     linesonleft.push_back(lines[i][2]);
                     linesonleft.push_back(lines[i][3]);
-                    linesonleft.push_back(slope1);
+                    linesonleft.push_back(INT_MAX);
                     continue;
                 }
                 else {
@@ -86,7 +119,7 @@
                     linesonright.push_back(lines[i][1]);
                     linesonright.push_back(lines[i][2]);
                     linesonright.push_back(lines[i][3]);
-                    linesonright.push_back(slope1);
+                    linesonright.push_back(INT_MAX);
                     continue;
                 }
             }
@@ -140,16 +173,31 @@
         }
     }
     
-    NSString *returnstr = [NSString stringWithFormat: @"%@_%@_%@_%@_%@_%@_%@_%@",
-                            [NSString stringWithFormat:@"%d", line1x1],
-                            [NSString stringWithFormat:@"%d", line1y1],
-                            [NSString stringWithFormat:@"%d", line1x2],
-                            [NSString stringWithFormat:@"%d", line1y2],
-                            [NSString stringWithFormat:@"%d", line2x1],
-                            [NSString stringWithFormat:@"%d", line2y1],
-                            [NSString stringWithFormat:@"%d", line2x2],
-                            [NSString stringWithFormat:@"%d", line2y2]];
+    NSString *returnstr = @"";
     
+    // Send the points for texture
+    if (lineMap) {
+        returnstr = [NSString stringWithFormat: @"%@_%@_%@_%@_%@_%@_%@_%@",
+                    [NSString stringWithFormat:@"%d", line1x1],
+                    [NSString stringWithFormat:@"%d", line1y1],
+                    [NSString stringWithFormat:@"%d", line1x2],
+                    [NSString stringWithFormat:@"%d", line1y2],
+                    [NSString stringWithFormat:@"%d", line2x1],
+                    [NSString stringWithFormat:@"%d", line2y1],
+                    [NSString stringWithFormat:@"%d", line2x2],
+                    [NSString stringWithFormat:@"%d", line2y2]];
+    }
+    // Send all the lines
+    else {
+        for(size_t i = 0; i < lines.size(); i++) {
+            returnstr = [NSString stringWithFormat: @"%@_%@_%@_%@_%@_",
+                        returnstr,
+                        [NSString stringWithFormat:@"%d", lines[i][0]],
+                        [NSString stringWithFormat:@"%d", lines[i][1]],
+                        [NSString stringWithFormat:@"%d", lines[i][2]],
+                        [NSString stringWithFormat:@"%d", lines[i][3]]];
+        }
+    }
     
     // Return the lines
     return returnstr;

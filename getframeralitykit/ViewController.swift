@@ -18,11 +18,11 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     var timer : Timer!
     var updateCV : Bool = true
     
-    var cannyFirstSliderValue : Float = 50.0
-    var cannySecondSliderValue : Float = 50.0
-    var houghThresholdSliderValue : Float = 50.0
-    var houghMinLengthSliderValue : Float = 50.0
-    var houghMaxGapSliderValue : Float = 50.0
+    var cannyFirstSliderValue : Float = 100.0
+    var cannySecondSliderValue : Float = 150.0
+    var houghThresholdSliderValue : Float = 25.0
+    var houghMinLengthSliderValue : Float = 400.0
+    var houghMaxGapSliderValue : Float = 150.0
     
     var cannyFirstLabel : UILabel = UILabel()
     var cannySecondLabel : UILabel = UILabel()
@@ -32,6 +32,9 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     var imagePicker = UIImagePickerController()
     var image = UIImage()
+    
+    var lineMapButton : Bool = false
+    
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidLoad()
@@ -61,12 +64,12 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         let cannyFirstSlider = UISlider(frame: cannyFirstRect)
         cannyFirstSlider.maximumValue = 255
         cannyFirstSlider.minimumValue = 0
-        cannyFirstSlider.value = 50
+        cannyFirstSlider.value = cannyFirstSliderValue
         cannyFirstSlider.isContinuous = true
         // add the label for slider
-        let cannyFirstLabelRect = CGRect(x: 160, y: 625, width: 35, height: 15)
+        let cannyFirstLabelRect = CGRect(x: 160, y: 625, width: 55, height: 15)
         cannyFirstLabel = UILabel(frame: cannyFirstLabelRect)
-        cannyFirstLabel.text = "50"
+        cannyFirstLabel.text = "\(cannyFirstSliderValue)"
         
         cannyFirstSlider.addTarget(self, action: #selector(cannyFirstSliderChanged(sender:)),
                                    for: UIControl.Event.valueChanged)
@@ -79,12 +82,12 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         let cannySecondSlider = UISlider(frame: cannySecondRect)
         cannySecondSlider.maximumValue = 255
         cannySecondSlider.minimumValue = 0
-        cannySecondSlider.value = 50
+        cannySecondSlider.value = cannySecondSliderValue
         cannySecondSlider.isContinuous = true
         // add the label for slider
-        let cannySecondLabelRect = CGRect(x: 160, y: 675, width: 35, height: 15)
+        let cannySecondLabelRect = CGRect(x: 160, y: 675, width: 55, height: 15)
         cannySecondLabel = UILabel(frame: cannySecondLabelRect)
-        cannySecondLabel.text = "50"
+        cannySecondLabel.text = "\(cannySecondSliderValue)"
         
         cannySecondSlider.addTarget(self, action: #selector(cannySecondSliderChanged(sender:)),
                                    for: UIControl.Event.valueChanged)
@@ -95,14 +98,14 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         // hough's treshold
         let houghThresholdRect = CGRect(x: 210, y: 575, width: 140, height: 10)
         let houghThresholdSlider = UISlider(frame: houghThresholdRect)
-        houghThresholdSlider.maximumValue = 255
+        houghThresholdSlider.maximumValue = 50
         houghThresholdSlider.minimumValue = 0
-        houghThresholdSlider.value = 50
+        houghThresholdSlider.value = houghThresholdSliderValue
         houghThresholdSlider.isContinuous = true
         // add the label for slider
-        let houghThresholdLabelRect = CGRect(x: 355, y: 575, width: 35, height: 15)
+        let houghThresholdLabelRect = CGRect(x: 355, y: 575, width: 55, height: 15)
         houghThresholdLabel = UILabel(frame: houghThresholdLabelRect)
-        houghThresholdLabel.text = "50"
+        houghThresholdLabel.text = "\(houghThresholdSliderValue)"
         
         houghThresholdSlider.addTarget(self, action: #selector(houghThresholdSliderChanged(sender:)),
                                    for: UIControl.Event.valueChanged)
@@ -115,12 +118,12 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         let houghMinLengthSlider = UISlider(frame: houghMinLengthRect)
         houghMinLengthSlider.maximumValue = 1000
         houghMinLengthSlider.minimumValue = 0
-        houghMinLengthSlider.value = 50
+        houghMinLengthSlider.value = houghMinLengthSliderValue
         houghMinLengthSlider.isContinuous = true
         // add the label for slider
-        let houghMinLengthLabelRect = CGRect(x: 355, y: 625, width: 35, height: 15)
+        let houghMinLengthLabelRect = CGRect(x: 355, y: 625, width: 55, height: 15)
         houghMinLengthLabel = UILabel(frame: houghMinLengthLabelRect)
-        houghMinLengthLabel.text = "50"
+        houghMinLengthLabel.text = "\(houghMinLengthSliderValue)"
         
         houghMinLengthSlider.addTarget(self, action: #selector(houghMinLengthSliderChanged(sender:)),
                                    for: UIControl.Event.valueChanged)
@@ -133,18 +136,26 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         let houghMaxGapSlider = UISlider(frame: houghMaxGapRect)
         houghMaxGapSlider.maximumValue = 255
         houghMaxGapSlider.minimumValue = 0
-        houghMaxGapSlider.value = 50
+        houghMaxGapSlider.value = houghMaxGapSliderValue
         houghMaxGapSlider.isContinuous = true
         // add the label for slider
-        let houghMaxGapLabelRect = CGRect(x: 355, y: 675, width: 35, height: 15)
+        let houghMaxGapLabelRect = CGRect(x: 355, y: 675, width: 55, height: 15)
         houghMaxGapLabel = UILabel(frame: houghMaxGapLabelRect)
-        houghMaxGapLabel.text = "50"
+        houghMaxGapLabel.text = "\(houghMaxGapSliderValue)"
         
         houghMaxGapSlider.addTarget(self, action: #selector(houghMaxGapSliderChanged(sender:)),
                                    for: UIControl.Event.valueChanged)
         
         self.view.addSubview(houghMaxGapSlider)
         self.view.addSubview(houghMaxGapLabel)
+        
+        let lineMapButtonRect = CGRect(x: 15, y: 560, width: 140, height: 40)
+        let lineMapButton = UIButton(frame: lineMapButtonRect)
+        lineMapButton.backgroundColor = UIColor.darkGray
+        lineMapButton.setTitle("Line/Mapping", for: .normal)
+        lineMapButton.addTarget(self, action: #selector(buttonAction), for: .touchUpInside)
+
+        self.view.addSubview(lineMapButton)
         
         // Ask to get the texture
         if UIImagePickerController.isSourceTypeAvailable(.savedPhotosAlbum){
@@ -161,10 +172,16 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         
         image = (info[.originalImage] as? UIImage)!
+        let rect = CGRect(x: 0, y: 0, width: 100, height: 100)
+        UIGraphicsBeginImageContextWithOptions(CGSize(width: 100, height: 100), false, 1.0)
+        image.draw(in: rect)
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        image = newImage!
         
         imagePicker.dismiss(animated: true, completion: nil)
+        
     }
-    
     
     @objc func enableUpdateCV() {
         updateCV = true;
@@ -194,25 +211,40 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         houghMaxGapSliderValue = sender.value
         houghMaxGapLabel.text = String(format: "%.0f", sender.value)
     }
+    
+    @objc func buttonAction(sender: UIButton!) {
+        
+        if (lineMapButton) {
+            lineMapButton = false
+        }
+        else {
+            lineMapButton = true
+        }
+    }
 }
 
 extension ViewController: ARSessionDelegate {
-    /*
+    
     func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
         for anchor in anchors {
             if anchor is ARImageAnchor {
                 
-                let pos = vector3(anchor.transform[3][0], anchor.transform[3][1], anchor.transform[3][2])
-                let projection = arView.project(pos)
+                let anchorEntity = AnchorEntity(anchor: anchor)
                 
-                let a =  opencv.test3(Int32(projection!.x), y: Int32(projection!.y),
-                                  image: arView.session.currentFrame!.capturedImage)
+                let ball = ModelEntity(mesh: MeshResource.generateSphere(radius: 0.005), materials: [SimpleMaterial()])
+                anchorEntity.addChild(ball)
+                let ball2 = ModelEntity(mesh: MeshResource.generateSphere(radius: 0.005), materials: [SimpleMaterial()])
+                ball2.position.x += 0.025
+                anchorEntity.addChild(ball2)
+                let ball3 = ModelEntity(mesh: MeshResource.generateSphere(radius: 0.005), materials: [SimpleMaterial()])
+                ball3.position.x -= 0.025
+                anchorEntity.addChild(ball3)
                 
-                print(a);
+                arView.scene.addAnchor(anchorEntity)
                 
             }
         }
-    }*/
+    }
     
     func session(_ session: ARSession, didUpdate anchors: [ARAnchor]) {
         for anchor in anchors {
@@ -232,7 +264,8 @@ extension ViewController: ARSessionDelegate {
                                              houghThreshold: Double(houghThresholdSliderValue),
                                              houghMinLength: Double(houghMinLengthSliderValue),
                                              houghMaxGap: Double(houghMaxGapSliderValue),
-                                             image: arView.session.currentFrame!.capturedImage)
+                                             image: arView.session.currentFrame!.capturedImage,
+                                             lineMap: lineMapButton)
                     
                     let points = lines.split(separator: "_")
                     
@@ -243,29 +276,81 @@ extension ViewController: ARSessionDelegate {
                         }
                     }
                     
-                    let line = UIBezierPath()
+                    if (lineMapButton) {
+                    /*
+                        let line = UIBezierPath()
+                        
+                        line.move(to: CGPoint(x: Double(String(points[0]))! * multiplier,
+                                              y: Double(String(points[1]))! * multiplier))
+                        line.addLine(to: CGPoint(x: Double(String(points[2]))! * multiplier,
+                                                 y: Double(String(points[3]))! * multiplier))
+                        
+                        // fix X polygon thing
+                        if (Double(String(points[3]))! > Double(String(points[1]))!) {
+                            if (Double(String(points[5]))! > Double(String(points[7]))!) {
+
+                                line.addLine(to: CGPoint(x: Double(String(points[4]))! * multiplier,
+                                                         y: Double(String(points[5]))! * multiplier))
+                                line.addLine(to: CGPoint(x: Double(String(points[6]))! * multiplier,
+                                                         y: Double(String(points[7]))! * multiplier))
+                            }
+                            else {
+                                
+                                line.addLine(to: CGPoint(x: Double(String(points[6]))! * multiplier,
+                                                         y: Double(String(points[7]))! * multiplier))
+                                line.addLine(to: CGPoint(x: Double(String(points[4]))! * multiplier,
+                                                         y: Double(String(points[5]))! * multiplier))
+                            }
+                        }
+                        else {
+                            if (Double(String(points[5]))! > Double(String(points[7]))!) {
+                                
+                                line.addLine(to: CGPoint(x: Double(String(points[6]))! * multiplier,
+                                                         y: Double(String(points[7]))! * multiplier))
+                                line.addLine(to: CGPoint(x: Double(String(points[4]))! * multiplier,
+                                                         y: Double(String(points[5]))! * multiplier))
+                            }
+                            else {
+                                
+                                line.addLine(to: CGPoint(x: Double(String(points[4]))! * multiplier,
+                                                         y: Double(String(points[5]))! * multiplier))
+                                line.addLine(to: CGPoint(x: Double(String(points[6]))! * multiplier,
+                                                         y: Double(String(points[7]))! * multiplier))
+                            }
+                        }
+                        line.close()
+                        
+                        let shapeLayer = CAShapeLayer()
+                        shapeLayer.path = line.cgPath
+                        shapeLayer.opacity = 1
+                        shapeLayer.fillColor = UIColor(patternImage: image).cgColor
+                        shapeLayer.lineJoin = CAShapeLayerLineJoin.miter
                     
-                    line.move(to: CGPoint(x: Double(String(points[0]))! * multiplier,
-                                          y: Double(String(points[1]))! * multiplier))
-                    line.addLine(to: CGPoint(x: Double(String(points[2]))! * multiplier,
-                                             y: Double(String(points[3]))! * multiplier))
-                    line.addLine(to: CGPoint(x: Double(String(points[6]))! * multiplier,
-                                             y: Double(String(points[7]))! * multiplier))
-                    line.addLine(to: CGPoint(x: Double(String(points[4]))! * multiplier,
-                                             y: Double(String(points[5]))! * multiplier))
-                    line.close()
-                    
-                    
-                    let shapeLayer = CAShapeLayer()
-                    shapeLayer.path = line.cgPath
-                    shapeLayer.opacity = 0.5
-                    shapeLayer.strokeColor = UIColor.blue.cgColor
-                    shapeLayer.fillColor = UIColor(patternImage: image).cgColor
-                    shapeLayer.lineWidth = 3
-                    shapeLayer.lineJoin = CAShapeLayerLineJoin.miter
-                
-                    arView.layer.addSublayer(shapeLayer)
-                
+                        arView.layer.addSublayer(shapeLayer)*/
+                    }
+                    else {
+                        
+                        if (points.count == 0) {
+                            break
+                        }
+                        for i in 0...points.count/4 - 1 {
+                            let line = UIBezierPath()
+                            
+                            line.move(to: CGPoint(x: Double(String(points[i*4]))! * multiplier,
+                                                  y: Double(String(points[i*4 + 1]))! * multiplier))
+                            line.addLine(to: CGPoint(x: Double(String(points[i*4 + 2]))! * multiplier,
+                                                     y: Double(String(points[i*4 + 3]))! * multiplier))
+                            line.close()
+                                
+                            let shapeLayer = CAShapeLayer()
+                            shapeLayer.path = line.cgPath
+                            shapeLayer.opacity = 1
+                            shapeLayer.strokeColor = UIColor.blue.cgColor
+                            shapeLayer.lineWidth = 3
+                        
+                            arView.layer.addSublayer(shapeLayer)
+                        }
+                    }
                     
                     updateCV = false
                 }

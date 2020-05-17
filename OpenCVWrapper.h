@@ -20,7 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
                    houghThreshold: (double)houghThreshold
                    houghMinLength: (double)houghMinLength
                    houghMaxGap: (double)houghMaxGap
-                   image: (CVPixelBufferRef)image;
+                   image: (CVPixelBufferRef)image
+                   lineMap: (bool)lineMap;
 
 
 @end
