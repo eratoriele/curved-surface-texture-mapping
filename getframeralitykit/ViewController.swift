@@ -24,16 +24,17 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     var houghMinLengthSliderValue : Float = 400.0
     var houghMaxGapSliderValue : Float = 150.0
     
-    var cannyFirstLabel : UILabel = UILabel()
-    var cannySecondLabel : UILabel = UILabel()
-    var houghThresholdLabel : UILabel = UILabel()
-    var houghMinLengthLabel : UILabel = UILabel()
-    var houghMaxGapLabel : UILabel = UILabel()
+    var cannyFirstLabel : UILabel?
+    var cannySecondLabel : UILabel?
+    var houghThresholdLabel : UILabel?
+    var houghMinLengthLabel : UILabel?
+    var houghMaxGapLabel : UILabel?
     
     var imagePicker = UIImagePickerController()
-    var image = UIImage()
+    var image : UIImage?
     
     var lineMapButton : Bool = false
+    var deneme : Bool = true
     
     
     override func viewDidAppear(_ animated: Bool) {
@@ -69,13 +70,13 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         // add the label for slider
         let cannyFirstLabelRect = CGRect(x: 160, y: 625, width: 55, height: 15)
         cannyFirstLabel = UILabel(frame: cannyFirstLabelRect)
-        cannyFirstLabel.text = "\(cannyFirstSliderValue)"
+        cannyFirstLabel!.text = "\(cannyFirstSliderValue)"
         
         cannyFirstSlider.addTarget(self, action: #selector(cannyFirstSliderChanged(sender:)),
                                    for: UIControl.Event.valueChanged)
         
         self.view.addSubview(cannyFirstSlider)
-        self.view.addSubview(cannyFirstLabel)
+        self.view.addSubview(cannyFirstLabel!)
         
         // canny's second treshold
         let cannySecondRect = CGRect(x: 15, y: 675, width: 140, height: 10)
@@ -87,13 +88,13 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         // add the label for slider
         let cannySecondLabelRect = CGRect(x: 160, y: 675, width: 55, height: 15)
         cannySecondLabel = UILabel(frame: cannySecondLabelRect)
-        cannySecondLabel.text = "\(cannySecondSliderValue)"
+        cannySecondLabel!.text = "\(cannySecondSliderValue)"
         
         cannySecondSlider.addTarget(self, action: #selector(cannySecondSliderChanged(sender:)),
                                    for: UIControl.Event.valueChanged)
         
         self.view.addSubview(cannySecondSlider)
-        self.view.addSubview(cannySecondLabel)
+        self.view.addSubview(cannySecondLabel!)
         
         // hough's treshold
         let houghThresholdRect = CGRect(x: 210, y: 575, width: 140, height: 10)
@@ -105,13 +106,13 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         // add the label for slider
         let houghThresholdLabelRect = CGRect(x: 355, y: 575, width: 55, height: 15)
         houghThresholdLabel = UILabel(frame: houghThresholdLabelRect)
-        houghThresholdLabel.text = "\(houghThresholdSliderValue)"
+        houghThresholdLabel!.text = "\(houghThresholdSliderValue)"
         
         houghThresholdSlider.addTarget(self, action: #selector(houghThresholdSliderChanged(sender:)),
                                    for: UIControl.Event.valueChanged)
         
         self.view.addSubview(houghThresholdSlider)
-        self.view.addSubview(houghThresholdLabel)
+        self.view.addSubview(houghThresholdLabel!)
         
         // hough's min line length
         let houghMinLengthRect = CGRect(x: 210, y: 625, width: 140, height: 10)
@@ -123,13 +124,13 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         // add the label for slider
         let houghMinLengthLabelRect = CGRect(x: 355, y: 625, width: 55, height: 15)
         houghMinLengthLabel = UILabel(frame: houghMinLengthLabelRect)
-        houghMinLengthLabel.text = "\(houghMinLengthSliderValue)"
+        houghMinLengthLabel!.text = "\(houghMinLengthSliderValue)"
         
         houghMinLengthSlider.addTarget(self, action: #selector(houghMinLengthSliderChanged(sender:)),
                                    for: UIControl.Event.valueChanged)
         
         self.view.addSubview(houghMinLengthSlider)
-        self.view.addSubview(houghMinLengthLabel)
+        self.view.addSubview(houghMinLengthLabel!)
         
         // hough's max line gap
         let houghMaxGapRect = CGRect(x: 210, y: 675, width: 140, height: 10)
@@ -141,13 +142,13 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         // add the label for slider
         let houghMaxGapLabelRect = CGRect(x: 355, y: 675, width: 55, height: 15)
         houghMaxGapLabel = UILabel(frame: houghMaxGapLabelRect)
-        houghMaxGapLabel.text = "\(houghMaxGapSliderValue)"
+        houghMaxGapLabel!.text = "\(houghMaxGapSliderValue)"
         
         houghMaxGapSlider.addTarget(self, action: #selector(houghMaxGapSliderChanged(sender:)),
                                    for: UIControl.Event.valueChanged)
         
         self.view.addSubview(houghMaxGapSlider)
-        self.view.addSubview(houghMaxGapLabel)
+        self.view.addSubview(houghMaxGapLabel!)
         
         let lineMapButtonRect = CGRect(x: 15, y: 560, width: 140, height: 40)
         let lineMapButton = UIButton(frame: lineMapButtonRect)
@@ -174,7 +175,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         image = (info[.originalImage] as? UIImage)!
         let rect = CGRect(x: 0, y: 0, width: 100, height: 100)
         UIGraphicsBeginImageContextWithOptions(CGSize(width: 100, height: 100), false, 1.0)
-        image.draw(in: rect)
+        image!.draw(in: rect)
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         image = newImage!
@@ -189,37 +190,132 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     @objc func cannyFirstSliderChanged(sender: UISlider) {
         cannyFirstSliderValue = sender.value
-        cannyFirstLabel.text = String(format: "%.0f", sender.value)
+        cannyFirstLabel!.text = String(format: "%.0f", sender.value)
     }
     
     @objc func cannySecondSliderChanged(sender: UISlider) {
         cannySecondSliderValue = sender.value
-        cannySecondLabel.text = String(format: "%.0f", sender.value)
+        cannySecondLabel!.text = String(format: "%.0f", sender.value)
     }
     
     @objc func houghThresholdSliderChanged(sender: UISlider) {
         houghThresholdSliderValue = sender.value
-        houghThresholdLabel.text = String(format: "%.0f", sender.value)
+        houghThresholdLabel!.text = String(format: "%.0f", sender.value)
     }
     
     @objc func houghMinLengthSliderChanged(sender: UISlider) {
         houghMinLengthSliderValue = sender.value
-        houghMinLengthLabel.text = String(format: "%.0f", sender.value)
+        houghMinLengthLabel!.text = String(format: "%.0f", sender.value)
     }
     
     @objc func houghMaxGapSliderChanged(sender: UISlider) {
         houghMaxGapSliderValue = sender.value
-        houghMaxGapLabel.text = String(format: "%.0f", sender.value)
+        houghMaxGapLabel!.text = String(format: "%.0f", sender.value)
     }
     
     @objc func buttonAction(sender: UIButton!) {
         
-        if (lineMapButton) {
-            lineMapButton = false
+        // Find the location of edges in the screen
+        
+        // Origin of the world
+        let worldOrigin = AnchorEntity(world: [0,0,0])
+        var anchorEntity : AnchorEntity?
+        
+        var markerPositions : [CGPoint] = [CGPoint]()
+        for anc in arView.scene.anchors {
+            if anc is AnchorEntity && anc.name == "entityWithBall" {
+                anchorEntity = anc as? AnchorEntity
+                
+                for ball in anchorEntity!.children {
+                    let ballpos = ball.position(relativeTo: worldOrigin)
+                    let aaa = vector3(ballpos[0], ballpos[1], ballpos[2])
+                    // contents are: [0] -> image plane, also the point wher ethe image center is
+                    // [1] -> leftEdge, left side of the image
+                    // [2] -> rightEdge, right side of the image
+                    markerPositions.append(arView.project(aaa)!)
+                }
+            }
+        }
+        
+        lineMapButton = !lineMapButton
+
+        let multiplier : Double = Double(arView.bounds.size.height / (arView.session.configuration?.videoFormat.imageResolution.width)!)
+        
+        // Now call for the closest left and right lines
+        
+        let lines =  opencv.test(Int32(Double(markerPositions[0].x) / multiplier),
+                                 y: Int32(Double(markerPositions[0].y) / multiplier),
+                                 cannyFirstThreshold: Double(cannyFirstSliderValue),
+                                 cannySecondThreshold: Double(cannySecondSliderValue),
+                                 houghThreshold: Double(houghThresholdSliderValue),
+                                 houghMinLength: Double(houghMinLengthSliderValue),
+                                 houghMaxGap: Double(houghMaxGapSliderValue),
+                                 image: arView.session.currentFrame!.capturedImage,
+                                 lineMap: lineMapButton)
+        
+        // [0] through [3] is left line, [4] through [7] is right line
+        // [8] [9] is the point that intersects the left line
+        // [10] [11] is the point that intersects the right line
+        let points = lines.split(separator: "_")
+        
+        // Length of the marker is predetermined,
+        // TODO Change it from 5 cm to ARReferenceImage's real life length
+        let markerDiffx = markerPositions[2].x - markerPositions[1].x
+        let MarkerDiffy = markerPositions[2].y - markerPositions[2].y
+        let pixelsToCm = pow(Double(pow(markerDiffx, 2) + pow(MarkerDiffy, 2)), 0.5) / Double(5)
+        
+        // Check which line is longer, set that as the height of the cylinder
+        let leftDiffx = (Double(String(points[2]))! * multiplier) - (Double(String(points[0]))! * multiplier)
+        let leftDiffy = (Double(String(points[3]))! * multiplier) - (Double(String(points[1]))! * multiplier)
+        let leftLength = pow(pow(leftDiffx, 2) + pow(leftDiffy, 2), 0.5)
+        
+        let rightDiffx = (Double(String(points[6]))! * multiplier) - (Double(String(points[4]))! * multiplier)
+        let rightDiffy = (Double(String(points[7]))! * multiplier) - (Double(String(points[5]))! * multiplier)
+        let rightLength = pow(pow(rightDiffx, 2) + pow(rightDiffy, 2), 0.5)
+        
+        // Get the distance between left and right lines to determine the
+        // radiues of the cylinder
+        let linesDiffx = (Double(String(points[10]))! * multiplier) - (Double(String(points[8]))! * multiplier)
+        let linesDiffy = (Double(String(points[11]))! * multiplier) - (Double(String(points[9]))! * multiplier)
+        let radius = pow(pow(linesDiffx, 2) + pow(linesDiffy, 2), 0.5) / 2
+        
+        // [0] is the length of the cylinder
+        // [1] is how high the marker is
+        var longerLine : [Double] = [Double]()
+        if (rightLength < leftLength) {
+            longerLine.append(leftLength / pixelsToCm)
+            // the lower point is x1y1
+            if (Double(String(points[3]))! < Double(String(points[1]))!) {
+                let diffx = (Double(String(points[0]))! * multiplier) - (Double(String(points[8]))! * multiplier)
+                let diffy = (Double(String(points[1]))! * multiplier) - (Double(String(points[9]))! * multiplier)
+                longerLine.append(pow(pow(diffx, 2) + pow(diffy, 2), 0.5))
+            }
+            // the lower point is x2y2
+            else {
+                let diffx = (Double(String(points[2]))! * multiplier) - (Double(String(points[8]))! * multiplier)
+                let diffy = (Double(String(points[3]))! * multiplier) - (Double(String(points[9]))! * multiplier)
+                longerLine.append(pow(pow(diffx, 2) + pow(diffy, 2), 0.5))
+            }
         }
         else {
-            lineMapButton = true
+            longerLine.append(rightLength / pixelsToCm)
+            // the lower point is x1y1
+            if (Double(String(points[8]))! < Double(String(points[5]))!) {
+                let diffx = (Double(String(points[4]))! * multiplier) - (Double(String(points[8]))! * multiplier)
+                let diffy = (Double(String(points[5]))! * multiplier) - (Double(String(points[9]))! * multiplier)
+                longerLine.append(pow(pow(diffx, 2) + pow(diffy, 2), 0.5))
+            }
+            // the lower point is x2y2
+            else {
+                let diffx = (Double(String(points[6]))! * multiplier) - (Double(String(points[8]))! * multiplier)
+                let diffy = (Double(String(points[7]))! * multiplier) - (Double(String(points[9]))! * multiplier)
+                longerLine.append(pow(pow(diffx, 2) + pow(diffy, 2), 0.5))
+            }
         }
+        
+        
+        
+        
     }
 }
 
@@ -229,19 +325,33 @@ extension ViewController: ARSessionDelegate {
         for anchor in anchors {
             if anchor is ARImageAnchor {
                 
-                let anchorEntity = AnchorEntity(anchor: anchor)
+                let imganc = anchor as! ARImageAnchor
+                let width = imganc.referenceImage.physicalSize.width * imganc.estimatedScaleFactor
+                let height = imganc.referenceImage.physicalSize.width * imganc.estimatedScaleFactor
                 
-                let ball = ModelEntity(mesh: MeshResource.generateSphere(radius: 0.005), materials: [SimpleMaterial()])
-                anchorEntity.addChild(ball)
-                let ball2 = ModelEntity(mesh: MeshResource.generateSphere(radius: 0.005), materials: [SimpleMaterial()])
-                ball2.position.x += 0.025
-                anchorEntity.addChild(ball2)
-                let ball3 = ModelEntity(mesh: MeshResource.generateSphere(radius: 0.005), materials: [SimpleMaterial()])
-                ball3.position.x -= 0.025
-                anchorEntity.addChild(ball3)
+                let anchorEntity = AnchorEntity(anchor: anchor)
+                anchorEntity.name = "entityWithBall"
+                
+                // A plane that covers the whole image to signify that it is found
+                let imagePlane = ModelEntity(
+                    mesh: MeshResource.generatePlane(width: Float(width), depth: Float(height)),
+                    materials: [SimpleMaterial(color: UIColor.green, isMetallic: false)])
+                anchorEntity.addChild(imagePlane)
+                
+                // Left edge of the image
+                let leftedge = ModelEntity(mesh: MeshResource.generateSphere(radius: 0.005), materials: [SimpleMaterial()])
+                leftedge.position.x += Float(width) / 2
+                anchorEntity.addChild(leftedge)
+                
+                //Right edge of the image
+                let rightedge = ModelEntity(mesh: MeshResource.generateSphere(radius: 0.005), materials: [SimpleMaterial()])
+                rightedge.position.x -= Float(width) / 2
+                anchorEntity.addChild(rightedge)
+                
+                // Find the difference between how many pixels are
+                // between left and right edge to determine pixels per cm
                 
                 arView.scene.addAnchor(anchorEntity)
-                
             }
         }
     }
@@ -255,7 +365,7 @@ extension ViewController: ARSessionDelegate {
                     let pos = vector3(anchor.transform[3][0], anchor.transform[3][1], anchor.transform[3][2])
                     let projection = arView.project(pos)
                     
-                    let multiplier : Double = 736 / 1920;
+                    let multiplier : Double = Double(arView.bounds.size.height / (arView.session.configuration?.videoFormat.imageResolution.width)!);
                     
                     let lines =  opencv.test(Int32(Double(projection!.x) / multiplier),
                                              y: Int32(Double(projection!.y) / multiplier),

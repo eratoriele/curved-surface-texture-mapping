@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		22581A8B2472626D006EC481 /* Cylinder.rcproject in Sources */ = {isa = PBXBuildFile; fileRef = 22581A8A2472626D006EC481 /* Cylinder.rcproject */; };
 		2282FB6E2459E10000669E11 /* OpenCVWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2282FB6D2459E10000669E11 /* OpenCVWrapper.mm */; };
 		22BB6F47244B00860028727C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22BB6F46244B00860028727C /* AppDelegate.swift */; };
 		22BB6F49244B00860028727C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22BB6F48244B00860028727C /* ViewController.swift */; };
@@ -38,6 +39,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		22581A8A2472626D006EC481 /* Cylinder.rcproject */ = {isa = PBXFileReference; lastKnownFileType = file.rcproject; name = Cylinder.rcproject; path = "../../../Library/Mobile Documents/com~apple~CloudDocs/Reality Composer/Cylinder.rcproject"; sourceTree = "<group>"; };
 		2282FB6C2459E10000669E11 /* getframeralitykit-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "getframeralitykit-Bridging-Header.h"; sourceTree = "<group>"; };
 		2282FB6D2459E10000669E11 /* OpenCVWrapper.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = OpenCVWrapper.mm; sourceTree = "<group>"; };
 		2282FB6F2459E1CD00669E11 /* OpenCVWrapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpenCVWrapper.h; sourceTree = "<group>"; };
@@ -124,6 +126,7 @@
 				22BB6F46244B00860028727C /* AppDelegate.swift */,
 				22BB6F48244B00860028727C /* ViewController.swift */,
 				22BB6F4C244B00870028727C /* Main.storyboard */,
+				22581A8A2472626D006EC481 /* Cylinder.rcproject */,
 				22BB6F4F244B00900028727C /* Assets.xcassets */,
 				22BB6F51244B00900028727C /* LaunchScreen.storyboard */,
 				22BB6F54244B00900028727C /* Info.plist */,
@@ -378,6 +381,7 @@
 			files = (
 				22BB6F49244B00860028727C /* ViewController.swift in Sources */,
 				22BB6F47244B00860028727C /* AppDelegate.swift in Sources */,
+				22581A8B2472626D006EC481 /* Cylinder.rcproject in Sources */,
 				2282FB6E2459E10000669E11 /* OpenCVWrapper.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
