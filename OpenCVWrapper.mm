@@ -49,6 +49,22 @@
     std::vector<cv::Vec4i> lines;
     cv::HoughLinesP(edges, lines, 1, CV_PI / 360, houghThreshold, houghMinLength, houghMaxGap);
     
+    if (!lineMap) {
+        
+        NSString *returnstr = @"";
+        
+        for(size_t i = 0; i < lines.size(); i++) {
+            returnstr = [NSString stringWithFormat: @"%@_%@_%@_%@_%@_",
+                        returnstr,
+                        [NSString stringWithFormat:@"%d", lines[i][0]],
+                        [NSString stringWithFormat:@"%d", lines[i][1]],
+                        [NSString stringWithFormat:@"%d", lines[i][2]],
+                        [NSString stringWithFormat:@"%d", lines[i][3]]];
+        }
+        
+        return returnstr;
+    }
+    
     std::vector<int> linesonleft;
     std::vector<int> linesonright;
     
@@ -176,12 +192,12 @@
                     line1y1 = linesonleft[i*7 + 1];
                     line1x2 = linesonleft[i*7 + 2];
                     line1y2 = linesonleft[i*7 + 3];
-                    leftLineIntersectionx = linesonleft[i*7 + 5];
-                    leftLineIntersectiony = linesonleft[i*7 + 6];
                     line2x1 = linesonright[j*7];
                     line2y1 = linesonright[j*7 + 1];
                     line2x2 = linesonright[j*7 + 2];
                     line2y2 = linesonright[j*7 + 3];
+                    leftLineIntersectionx = linesonleft[i*7 + 5];
+                    leftLineIntersectiony = linesonleft[i*7 + 6];
                     rightLineIntersectionx = linesonright[i*7 + 5];
                     rightLineIntersectiony = linesonright[i*7 + 6];
                 }
@@ -192,32 +208,20 @@
     NSString *returnstr = @"";
     
     // Send the points for texture
-    if (lineMap) {
-        returnstr = [NSString stringWithFormat: @"%@_%@_%@_%@_%@_%@_%@_%@_%@_%@_%@_%@",
-                    [NSString stringWithFormat:@"%d", line1x1],
-                    [NSString stringWithFormat:@"%d", line1y1],
-                    [NSString stringWithFormat:@"%d", line1x2],
-                    [NSString stringWithFormat:@"%d", line1y2],
-                    [NSString stringWithFormat:@"%d", line2x1],
-                    [NSString stringWithFormat:@"%d", line2y1],
-                    [NSString stringWithFormat:@"%d", line2x2],
-                    [NSString stringWithFormat:@"%d", line2y2],
-                    [NSString stringWithFormat:@"%d", leftLineIntersectionx],
-                    [NSString stringWithFormat:@"%d", leftLineIntersectiony],
-                    [NSString stringWithFormat:@"%d", rightLineIntersectionx],
-                    [NSString stringWithFormat:@"%d", rightLineIntersectiony]];
-    }
-    // Send all the lines
-    else {
-        for(size_t i = 0; i < lines.size(); i++) {
-            returnstr = [NSString stringWithFormat: @"%@_%@_%@_%@_%@_",
-                        returnstr,
-                        [NSString stringWithFormat:@"%d", lines[i][0]],
-                        [NSString stringWithFormat:@"%d", lines[i][1]],
-                        [NSString stringWithFormat:@"%d", lines[i][2]],
-                        [NSString stringWithFormat:@"%d", lines[i][3]]];
-        }
-    }
+    returnstr = [NSString stringWithFormat: @"%@_%@_%@_%@_%@_%@_%@_%@_%@_%@_%@_%@",
+                [NSString stringWithFormat:@"%d", line1x1],
+                [NSString stringWithFormat:@"%d", line1y1],
+                [NSString stringWithFormat:@"%d", line1x2],
+                [NSString stringWithFormat:@"%d", line1y2],
+                [NSString stringWithFormat:@"%d", line2x1],
+                [NSString stringWithFormat:@"%d", line2y1],
+                [NSString stringWithFormat:@"%d", line2x2],
+                [NSString stringWithFormat:@"%d", line2y2],
+                [NSString stringWithFormat:@"%d", leftLineIntersectionx],
+                [NSString stringWithFormat:@"%d", leftLineIntersectiony],
+                [NSString stringWithFormat:@"%d", rightLineIntersectionx],
+                [NSString stringWithFormat:@"%d", rightLineIntersectiony]];
+
     
     // Return the lines
     return returnstr;

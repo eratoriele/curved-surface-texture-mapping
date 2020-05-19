@@ -257,6 +257,13 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         // [8] [9] is the point that intersects the left line
         // [10] [11] is the point that intersects the right line
         let points = lines.split(separator: "_")
+       
+        // means, no lines were found as possible matches
+        if (points[0] == "0") {
+            print("no lines found")
+            return
+        }
+        print(points)
         
         // Length of the marker is predetermined,
         // TODO Change it from 5 cm to ARReferenceImage's real life length
@@ -277,7 +284,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         // radiues of the cylinder
         let linesDiffx = (Double(String(points[10]))! * multiplier) - (Double(String(points[8]))! * multiplier)
         let linesDiffy = (Double(String(points[11]))! * multiplier) - (Double(String(points[9]))! * multiplier)
-        let radius = pow(pow(linesDiffx, 2) + pow(linesDiffy, 2), 0.5) / 2
+        let radius = pow(pow(linesDiffx, 2) + pow(linesDiffy, 2), 0.5) / (2 * pixelsToCm)
         
         // [0] is the length of the cylinder
         // [1] is how high the marker is
@@ -288,13 +295,13 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             if (Double(String(points[3]))! < Double(String(points[1]))!) {
                 let diffx = (Double(String(points[0]))! * multiplier) - (Double(String(points[8]))! * multiplier)
                 let diffy = (Double(String(points[1]))! * multiplier) - (Double(String(points[9]))! * multiplier)
-                longerLine.append(pow(pow(diffx, 2) + pow(diffy, 2), 0.5))
+                longerLine.append(pow(pow(diffx, 2) + pow(diffy, 2), 0.5) / pixelsToCm)
             }
             // the lower point is x2y2
             else {
                 let diffx = (Double(String(points[2]))! * multiplier) - (Double(String(points[8]))! * multiplier)
                 let diffy = (Double(String(points[3]))! * multiplier) - (Double(String(points[9]))! * multiplier)
-                longerLine.append(pow(pow(diffx, 2) + pow(diffy, 2), 0.5))
+                longerLine.append(pow(pow(diffx, 2) + pow(diffy, 2), 0.5) / pixelsToCm)
             }
         }
         else {
@@ -303,18 +310,26 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             if (Double(String(points[8]))! < Double(String(points[5]))!) {
                 let diffx = (Double(String(points[4]))! * multiplier) - (Double(String(points[8]))! * multiplier)
                 let diffy = (Double(String(points[5]))! * multiplier) - (Double(String(points[9]))! * multiplier)
-                longerLine.append(pow(pow(diffx, 2) + pow(diffy, 2), 0.5))
+                longerLine.append(pow(pow(diffx, 2) + pow(diffy, 2), 0.5) / pixelsToCm)
             }
             // the lower point is x2y2
             else {
                 let diffx = (Double(String(points[6]))! * multiplier) - (Double(String(points[8]))! * multiplier)
                 let diffy = (Double(String(points[7]))! * multiplier) - (Double(String(points[9]))! * multiplier)
-                longerLine.append(pow(pow(diffx, 2) + pow(diffy, 2), 0.5))
+                longerLine.append(pow(pow(diffx, 2) + pow(diffy, 2), 0.5) / pixelsToCm)
             }
         }
         
+        print(longerLine)
+        print(radius)
         
+        let box = ModelEntity(
+            mesh: MeshResource.generateBox(size: 0.015),
+            materials: [SimpleMaterial()])
+        box.position.y -= Float(radius / 200)
+        box.position.z += Float(longerLine[1] / 100)
         
+        anchorEntity!.addChild(box)
         
     }
 }
@@ -360,7 +375,7 @@ extension ViewController: ARSessionDelegate {
         for anchor in anchors {
             if anchor is ARImageAnchor {
                 
-                if (updateCV) {
+                if (updateCV && !lineMapButton) {
                 
                     let pos = vector3(anchor.transform[3][0], anchor.transform[3][1], anchor.transform[3][2])
                     let projection = arView.project(pos)
@@ -386,83 +401,30 @@ extension ViewController: ARSessionDelegate {
                         }
                     }
                     
-                    if (lineMapButton) {
-                    /*
+                        
+                    if (points.count == 0) {
+                        break
+                    }
+                    for i in 0...points.count/4 - 1 {
                         let line = UIBezierPath()
                         
-                        line.move(to: CGPoint(x: Double(String(points[0]))! * multiplier,
-                                              y: Double(String(points[1]))! * multiplier))
-                        line.addLine(to: CGPoint(x: Double(String(points[2]))! * multiplier,
-                                                 y: Double(String(points[3]))! * multiplier))
-                        
-                        // fix X polygon thing
-                        if (Double(String(points[3]))! > Double(String(points[1]))!) {
-                            if (Double(String(points[5]))! > Double(String(points[7]))!) {
-
-                                line.addLine(to: CGPoint(x: Double(String(points[4]))! * multiplier,
-                                                         y: Double(String(points[5]))! * multiplier))
-                                line.addLine(to: CGPoint(x: Double(String(points[6]))! * multiplier,
-                                                         y: Double(String(points[7]))! * multiplier))
-                            }
-                            else {
-                                
-                                line.addLine(to: CGPoint(x: Double(String(points[6]))! * multiplier,
-                                                         y: Double(String(points[7]))! * multiplier))
-                                line.addLine(to: CGPoint(x: Double(String(points[4]))! * multiplier,
-                                                         y: Double(String(points[5]))! * multiplier))
-                            }
-                        }
-                        else {
-                            if (Double(String(points[5]))! > Double(String(points[7]))!) {
-                                
-                                line.addLine(to: CGPoint(x: Double(String(points[6]))! * multiplier,
-                                                         y: Double(String(points[7]))! * multiplier))
-                                line.addLine(to: CGPoint(x: Double(String(points[4]))! * multiplier,
-                                                         y: Double(String(points[5]))! * multiplier))
-                            }
-                            else {
-                                
-                                line.addLine(to: CGPoint(x: Double(String(points[4]))! * multiplier,
-                                                         y: Double(String(points[5]))! * multiplier))
-                                line.addLine(to: CGPoint(x: Double(String(points[6]))! * multiplier,
-                                                         y: Double(String(points[7]))! * multiplier))
-                            }
-                        }
+                        line.move(to: CGPoint(x: Double(String(points[i*4]))! * multiplier,
+                                              y: Double(String(points[i*4 + 1]))! * multiplier))
+                        line.addLine(to: CGPoint(x: Double(String(points[i*4 + 2]))! * multiplier,
+                                                 y: Double(String(points[i*4 + 3]))! * multiplier))
                         line.close()
-                        
+                            
                         let shapeLayer = CAShapeLayer()
                         shapeLayer.path = line.cgPath
                         shapeLayer.opacity = 1
-                        shapeLayer.fillColor = UIColor(patternImage: image).cgColor
-                        shapeLayer.lineJoin = CAShapeLayerLineJoin.miter
+                        shapeLayer.strokeColor = UIColor.blue.cgColor
+                        shapeLayer.lineWidth = 3
                     
-                        arView.layer.addSublayer(shapeLayer)*/
-                    }
-                    else {
-                        
-                        if (points.count == 0) {
-                            break
-                        }
-                        for i in 0...points.count/4 - 1 {
-                            let line = UIBezierPath()
-                            
-                            line.move(to: CGPoint(x: Double(String(points[i*4]))! * multiplier,
-                                                  y: Double(String(points[i*4 + 1]))! * multiplier))
-                            line.addLine(to: CGPoint(x: Double(String(points[i*4 + 2]))! * multiplier,
-                                                     y: Double(String(points[i*4 + 3]))! * multiplier))
-                            line.close()
-                                
-                            let shapeLayer = CAShapeLayer()
-                            shapeLayer.path = line.cgPath
-                            shapeLayer.opacity = 1
-                            shapeLayer.strokeColor = UIColor.blue.cgColor
-                            shapeLayer.lineWidth = 3
-                        
-                            arView.layer.addSublayer(shapeLayer)
-                        }
+                        arView.layer.addSublayer(shapeLayer)
                     }
                     
                     updateCV = false
+                        
                 }
 
             }
